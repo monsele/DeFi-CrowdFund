@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 contract CrowdFund {
     address public owner;
+
     constructor() {
         lastId = 0;
         owner = msg.sender; // Set the owner in the constructor
@@ -12,8 +13,10 @@ contract CrowdFund {
 
     error CampaingnNotFound();
     error Insufficient_Balance();
+
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event paidCampaign(address indexed reciever, uint256 amountPaid);
+
     struct Campaingn {
         uint256 Id;
         string Name;
@@ -30,10 +33,11 @@ contract CrowdFund {
     mapping(uint256 Id => uint256 Deposits) CampaingnDeposits;
     uint256 public lastId;
 
-modifier onlyOwner {
-    require(msg.sender==owner);
-    _;
-}
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
     function GetCampaigns() external view returns (Campaingn[] memory) {
         return CampaingnList;
     }
@@ -47,7 +51,7 @@ modifier onlyOwner {
     ) external returns (bool) {
         uint256 id = incrementandReturnId();
 
-        Campaingn memory campaign = Campaingn(lastId, name, description, amountRaised, goal, depositAddress,true);
+        Campaingn memory campaign = Campaingn(lastId, name, description, amountRaised, goal, depositAddress, true);
         CampaingnList.push(campaign);
         CampaingnMapping[id] = campaign;
         return true;
@@ -66,20 +70,21 @@ modifier onlyOwner {
         }
         uint256 receivedAmount = msg.value;
         CampaingnDeposits[id] += receivedAmount;
+       
         return true;
     }
-    function payCampaign(uint256 id) public onlyOwner returns(bool){
-      Campaingn memory receiveingCamp = CampaingnMapping[id];
+
+    function payCampaign(uint256 id) public onlyOwner returns (bool) {
+        Campaingn memory receiveingCamp = CampaingnMapping[id];
         if (receiveingCamp.Id == 0) {
             revert CampaingnNotFound();
         }
         uint256 depositedAmt = CampaingnDeposits[id];
-         if(address(this).balance >= depositedAmt){
+        if (address(this).balance >= depositedAmt) {
             revert Insufficient_Balance();
-         } 
-         receiveingCamp.DepositAddress.transfer(depositedAmt);
+        }
+        receiveingCamp.DepositAddress.transfer(depositedAmt);
+        emit paidCampaign(receiveingCamp.DepositAddress, depositedAmt);
         return true;
     }
-
-
 }
