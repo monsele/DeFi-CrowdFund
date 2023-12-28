@@ -13,6 +13,7 @@ contract CrowdFund {
 
     error CampaingnNotFound();
     error Insufficient_Balance();
+    error Decimals_Exceeded();
 
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event paidCampaign(address indexed reciever, uint256 amountPaid);
@@ -54,6 +55,7 @@ contract CrowdFund {
         Campaingn memory campaign = Campaingn(lastId, name, description, amountRaised, goal, depositAddress, true);
         CampaingnList.push(campaign);
         CampaingnMapping[id] = campaign;
+        CampaingnDeposits[id] = 0;
         return true;
     }
 
@@ -62,19 +64,58 @@ contract CrowdFund {
         return lastId;
     }
 
-    function fundCampaign(uint256 id) external payable returns (bool) {
+    function getContractBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
+
+    function getCampaignDeposit(uint256 id) external view returns (uint256) {
+        return CampaingnDeposits[id];
+    }
+
+    function fundCampaign(uint256 id, uint256 amt) external payable returns (bool) {
         //find the campaign
         Campaingn memory receiveingCamp = CampaingnMapping[id];
         if (receiveingCamp.Id == 0) {
             revert CampaingnNotFound();
         }
-        uint256 receivedAmount = msg.value;
-        CampaingnDeposits[id] += receivedAmount;
-       
+        uint256 receivedAmount = amt;
+        if (receivedAmount == 0) {
+            revert Insufficient_Balance();
+        }
+        CampaingnDeposits[id] += msg.value;
+        if (receiveingCamp.Goal >= CampaingnDeposits[id]) {
+            payCampaign(id);
+        }
         return true;
     }
 
-    function payCampaign(uint256 id) public onlyOwner returns (bool) {
+    function fundContract(uint256 id) public payable {
+        //find the campaign
+        Campaingn memory receiveingCamp = CampaingnMapping[id];
+        if (receiveingCamp.Id == 0) {
+            revert CampaingnNotFound();
+        }
+        if (msg.value == 0) {
+            revert Insufficient_Balance();
+        }
+        CampaingnDeposits[id] += msg.value;
+    }
+
+    function payCampaign(uint256 id) public returns (bool) {
+        Campaingn memory receiveingCamp = CampaingnMapping[id];
+        if (receiveingCamp.Id == 0) {
+            revert CampaingnNotFound();
+        }
+        uint256 depositedAmt = CampaingnDeposits[id];
+        if (address(this).balance >= depositedAmt) {
+            revert Insufficient_Balance();
+        }
+        receiveingCamp.DepositAddress.transfer(depositedAmt);
+        emit paidCampaign(receiveingCamp.DepositAddress, depositedAmt);
+        return true;
+    }
+
+    function payCampaignOwner(uint256 id) private onlyOwner returns (bool) {
         Campaingn memory receiveingCamp = CampaingnMapping[id];
         if (receiveingCamp.Id == 0) {
             revert CampaingnNotFound();
