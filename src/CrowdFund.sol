@@ -1,46 +1,75 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
+// Layout of Contract:
+// version
+// imports
+// errors
+// interfaces, libraries, contracts
+// Type declarations
+// State variables
+// Events
+// Modifiers
+// Functions
+
+// Layout of Functions:
+// constructor
+// receive function (if exists)
+// fallback function (if exists)
+// external
+// public
+// internal
+// private
+// view & pure functions
+
 pragma solidity ^0.8.0;
 
+import {Campaingn} from "../libStructs/Common.sol";
+
 contract CrowdFund {
+    error CampaingnNotFound();
+    error Insufficient_Balance();
+    error Decimals_Exceeded();
+
+    //Interfaces, Type declarations
+    // struct Campaingn {
+    //     uint256 Id;
+    //     string Name;
+    //     string Description;
+    //     uint256 AmountRaised;
+    //     uint256 Goal;
+    //     address payable DepositAddress;
+    //     bool Open;
+    // }
+    //State variables
+
     address public owner;
+    Campaingn[] public CampaingnList;
+    mapping(uint256 => Campaingn) public CampaingnMapping;
+    mapping(uint256 Id => uint256 Deposits) public CampaingnDeposits;
+    uint256 public lastId;
+
+    event Transfer(address indexed from, address indexed to, uint256 amount);
+    event paidCampaign(address indexed reciever, uint256 amountPaid);
 
     constructor() {
         lastId = 0;
         owner = msg.sender; // Set the owner in the constructor
     }
 
-    // errors
-
-    error CampaingnNotFound();
-    error Insufficient_Balance();
-    error Decimals_Exceeded();
-
-    event Transfer(address indexed from, address indexed to, uint256 amount);
-    event paidCampaign(address indexed reciever, uint256 amountPaid);
-
-    struct Campaingn {
-        uint256 Id;
-        string Name;
-        string Description;
-        uint256 AmountRaised;
-        uint256 Goal;
-        address payable DepositAddress;
-        bool Open;
-    }
-    //Create a campaign
-
-    Campaingn[] public CampaingnList;
-    mapping(uint256 => Campaingn) CampaingnMapping;
-    mapping(uint256 Id => uint256 Deposits) CampaingnDeposits;
-    uint256 public lastId;
-
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
 
-    function GetCampaigns() external view returns (Campaingn[] memory) {
-        return CampaingnList;
+    function fundContract(uint256 id) public payable {
+        //find the campaign
+        Campaingn memory receiveingCamp = CampaingnMapping[id];
+        if (receiveingCamp.Id == 0) {
+            revert CampaingnNotFound();
+        }
+        if (msg.value == 0) {
+            revert Insufficient_Balance();
+        }
+        CampaingnDeposits[id] += msg.value;
     }
 
     function CreateCampaign(
@@ -59,46 +88,33 @@ contract CrowdFund {
         return true;
     }
 
-    function incrementandReturnId() private returns (uint256) {
-        lastId++;
-        return lastId;
+    function getCampaignDeposit(uint256 id) external view returns (uint256) {
+        return CampaingnDeposits[id];
     }
 
     function getContractBalance() public view returns (uint256) {
         return address(this).balance;
     }
 
-    function getCampaignDeposit(uint256 id) external view returns (uint256) {
-        return CampaingnDeposits[id];
+    function GetCampaigns() external view returns (Campaingn[] memory) {
+        return CampaingnList;
     }
 
-    function fundCampaign(uint256 id, uint256 amt) external payable returns (bool) {
-        //find the campaign
-        Campaingn memory receiveingCamp = CampaingnMapping[id];
-        if (receiveingCamp.Id == 0) {
-            revert CampaingnNotFound();
-        }
-        uint256 receivedAmount = amt;
-        if (receivedAmount == 0) {
-            revert Insufficient_Balance();
-        }
-        CampaingnDeposits[id] += msg.value;
-        if (receiveingCamp.Goal >= CampaingnDeposits[id]) {
-            payCampaign(id);
-        }
-        return true;
+    function GetCampaingnLength() public view returns (uint256) {
+        return CampaingnList.length;
     }
 
-    function fundContract(uint256 id) public payable {
-        //find the campaign
-        Campaingn memory receiveingCamp = CampaingnMapping[id];
-        if (receiveingCamp.Id == 0) {
-            revert CampaingnNotFound();
-        }
-        if (msg.value == 0) {
-            revert Insufficient_Balance();
-        }
-        CampaingnDeposits[id] += msg.value;
+    function GetCampaingn(uint256 id) public view returns (Campaingn memory) {
+        return CampaingnMapping[id];
+    }
+
+    function GetLastId() public view returns (uint256) {
+        return lastId;
+    }
+
+    function incrementandReturnId() private returns (uint256) {
+        lastId++;
+        return lastId;
     }
 
     function payCampaign(uint256 id) public returns (bool) {
