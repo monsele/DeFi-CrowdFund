@@ -60,7 +60,7 @@ contract CrowdFund {
         _;
     }
 
-    function fundContract(uint256 id) public payable {
+    function fundContract(uint256 id) public payable returns (bool) {
         //find the campaign
         Campaingn memory receiveingCamp = CampaingnMapping[id];
         if (receiveingCamp.Id == 0) {
@@ -70,6 +70,7 @@ contract CrowdFund {
             revert Insufficient_Balance();
         }
         CampaingnDeposits[id] += msg.value;
+        return true;
     }
 
     function CreateCampaign(
@@ -117,7 +118,7 @@ contract CrowdFund {
         return lastId;
     }
 
-    function payCampaign(uint256 id) public returns (bool) {
+    function payCampaign(uint256 id) public onlyOwner returns (bool) {
         Campaingn memory receiveingCamp = CampaingnMapping[id];
         if (receiveingCamp.Id == 0) {
             revert CampaingnNotFound();

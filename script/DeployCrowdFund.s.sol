@@ -6,5 +6,11 @@ import {CrowdFund} from "../src/CrowdFund.sol";
 
 contract DeployCrowdFund is Script {
     constructor() {}
-    function run() external returns (CrowdFund) {}
+
+    function run() external returns (CrowdFund) {
+        vm.startBroadcast();
+        CrowdFund fundMe = new CrowdFund();
+        vm.stopBroadcast();
+        return fundMe;
+    }
 }
