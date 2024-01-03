@@ -53,17 +53,11 @@ contract TestCrowdFund is Test {
         testFund.CreateCampaign(
             "Test Campaign", "Description", 0, 1000 wei, payable(0x1234567890123456789012345678901234567890)
         );
-        //Campaingn memory lastCampaign = testFund.GetCampaingn(testFund.GetCampaingnLength());
-        // testFund.CampaingnMapping[campaignId] = campaign;
-        //testFund.CampaingnDeposits[campaignId] = depositAmount;
-        //address payable expectedRecipient = payable(lastCampaign.DepositAddress);
-
         // Act
         bool success = testFund.fundContract{value: SEND_VALUE}(campaignId);
         // Assert
         assert(success == true);
         assert(address(this).balance > 0); // Contract balance reduced
-        //assert(expectedRecipient.balance == depositAmount); // Recipient received funds
     }
 
     function testWithNoValue() public {
@@ -73,6 +67,6 @@ contract TestCrowdFund is Test {
         Campaingn memory lastCampaign = testFund.GetCampaingn(testFund.GetCampaingnLength());
         // Act
         vm.expectRevert();
-        testFund.fundContract {value:SEND_NOVALUE}(lastCampaign.Id);
+        testFund.fundContract{value: SEND_NOVALUE}(lastCampaign.Id);
     }
 }

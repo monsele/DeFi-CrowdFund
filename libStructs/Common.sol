@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
         uint256 Id;
         string Name;
         string Description;
-        uint256 AmountRaised;
         uint256 Goal;
         address payable DepositAddress;
         bool Open;

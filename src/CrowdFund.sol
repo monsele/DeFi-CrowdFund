@@ -29,18 +29,6 @@ contract CrowdFund {
     error Insufficient_Balance();
     error Decimals_Exceeded();
 
-    //Interfaces, Type declarations
-    // struct Campaingn {
-    //     uint256 Id;
-    //     string Name;
-    //     string Description;
-    //     uint256 AmountRaised;
-    //     uint256 Goal;
-    //     address payable DepositAddress;
-    //     bool Open;
-    // }
-    //State variables
-
     address public owner;
     Campaingn[] public CampaingnList;
     mapping(uint256 => Campaingn) public CampaingnMapping;
@@ -50,14 +38,14 @@ contract CrowdFund {
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event paidCampaign(address indexed reciever, uint256 amountPaid);
 
-    constructor() {
-        lastId = 0;
-        owner = msg.sender; // Set the owner in the constructor
-    }
-
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
+    }
+
+    constructor() {
+        lastId = 0;
+        owner = msg.sender; // Set the owner in the constructor
     }
 
     function fundContract(uint256 id) public payable returns (bool) {
@@ -76,13 +64,12 @@ contract CrowdFund {
     function CreateCampaign(
         string memory name,
         string memory description,
-        uint256 amountRaised,
         uint256 goal,
         address payable depositAddress
     ) external returns (bool) {
         uint256 id = incrementandReturnId();
 
-        Campaingn memory campaign = Campaingn(lastId, name, description, amountRaised, goal, depositAddress, true);
+        Campaingn memory campaign = Campaingn(lastId, name, description, goal, depositAddress, true);
         CampaingnList.push(campaign);
         CampaingnMapping[id] = campaign;
         CampaingnDeposits[id] = 0;
