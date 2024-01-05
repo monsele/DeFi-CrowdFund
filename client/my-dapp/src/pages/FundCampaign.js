@@ -2,7 +2,7 @@ import {CampaignForm} from '../components/form'
 import React from 'react'
 import  {useNavigate}  from "react-router-dom";
 
-export default function FundCampaign(props) {
+export default function FundCampaign() {
   let navigate = useNavigate();
   const handleSendFunds = (event) => {
     event.preventDefault(); // Prevent default form submission

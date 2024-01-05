@@ -119,17 +119,4 @@ contract CrowdFund {
         return true;
     }
 
-    function payCampaignOwner(uint256 id) private onlyOwner returns (bool) {
-        Campaingn memory receiveingCamp = CampaingnMapping[id];
-        if (receiveingCamp.Id == 0) {
-            revert CampaingnNotFound();
-        }
-        uint256 depositedAmt = CampaingnDeposits[id];
-        if (address(this).balance >= depositedAmt) {
-            revert Insufficient_Balance();
-        }
-        receiveingCamp.DepositAddress.transfer(depositedAmt);
-        emit paidCampaign(receiveingCamp.DepositAddress, depositedAmt);
-        return true;
-    }
 }

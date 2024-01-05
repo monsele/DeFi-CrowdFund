@@ -26,7 +26,7 @@ contract TestCrowdFund is Test {
 
         // Act
         testFund.CreateCampaign(
-            "Test Campaign", "Description", 0, 1000 wei, payable(0x1234567890123456789012345678901234567890)
+            "Test Campaign", "Description", 1000 wei, payable(0x1234567890123456789012345678901234567890)
         );
 
         // Assert
@@ -39,8 +39,6 @@ contract TestCrowdFund is Test {
         assert(
             (keccak256(abi.encodePacked((lastCampaign.Description))) == keccak256(abi.encodePacked(("Description"))))
         );
-
-        assert(lastCampaign.AmountRaised == 0);
         assert(lastCampaign.Goal == 1000 wei);
         assert(lastCampaign.DepositAddress == payable(0x1234567890123456789012345678901234567890));
         assert(lastCampaign.Open == true);
@@ -51,7 +49,7 @@ contract TestCrowdFund is Test {
         uint256 campaignId = 1;
         // Campaingn memory campaign = Campaingn(campaignId, "Test Campaign", "Description", 0, 1000 wei, payable(0x1234567890123456789012345678901234567890),true);
         testFund.CreateCampaign(
-            "Test Campaign", "Description", 0, 1000 wei, payable(0x1234567890123456789012345678901234567890)
+            "Test Campaign", "Description", 1000 wei, payable(0x1234567890123456789012345678901234567890)
         );
         // Act
         bool success = testFund.fundContract{value: SEND_VALUE}(campaignId);
@@ -62,7 +60,7 @@ contract TestCrowdFund is Test {
 
     function testWithNoValue() public {
         testFund.CreateCampaign(
-            "Test Campaign", "Description", 0, 1000 wei, payable(0x1234567890123456789012345678901234567890)
+            "Test Campaign", "Description",1000 wei, payable(0x1234567890123456789012345678901234567890)
         );
         Campaingn memory lastCampaign = testFund.GetCampaingn(testFund.GetCampaingnLength());
         // Act

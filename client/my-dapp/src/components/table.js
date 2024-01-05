@@ -8,14 +8,16 @@ export const TableComponent = ({ data }) => {
           <th>Id</th>
           <th>Name</th>
           <th>Description</th>
+          <th>Goal</th>
         </tr>
       </thead>
       <tbody>
         {data.map((item) => (
           <tr key={item.id}>
-            <td>{item.id}</td>
+            <td>{item.id+1}</td>
             <td>{item.name}</td>
             <td>{item.description}</td>
+            <td>{item.goal}</td>
           </tr>
         ))}
       </tbody>
