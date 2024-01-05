@@ -1,16 +1,11 @@
 import { TableComponent } from "../components/table.js";
 import React, { useEffect,useState } from "react";
 import Web3 from "web3";
-import { ethers } from "ethers";
+
 import {contractAbi,contractAddress} from '../abi/CrowdFund.js'
 
 export default function CampaignList() {
-  const [dataCamp, setdataCamp] = useState([])
-  const myData = [
-    { id: 1, name: "Item 1", description: "Description of item 1" },
-    { id: 2, name: "Item 2", description: "Description of item 2" },
-    { id: 3, name: "Item 3", description: "Description of item 3" },
-  ];
+  const [dataCamp, setdataCamp] = useState([]);
 
   useEffect(() => {
     async function connectAndGetBalance() {
@@ -21,16 +16,13 @@ export default function CampaignList() {
       
         var camps = await contract.methods.GetCampaigns().call();
         let setUp=[];
-        // camps.forEach(element => {
-        //   setUp.push({id:1,name:element.Name});
-        // });
-
+          var check = camps.find(x=>x.Id===Number(camps[0].Id))
+          console.log(check);
         camps.forEach(function (value, i) {
           setUp.push({id:i,name:value.Name,description:value.Description,goal:Number(value.Goal)})
       });
-        //console.log(setUp);
-        await setdataCamp(setUp)
-        console.log(dataCamp);
+       // console.log(camps);
+        await setdataCamp(setUp);
       } catch (error) {
         console.error('Error connecting or fetching balance:', error);
       }

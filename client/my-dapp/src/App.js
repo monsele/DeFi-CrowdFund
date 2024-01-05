@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import {  Routes, Route } from 'react-router-dom';
 
 
 import CampaignList from './pages/CampaignList';
@@ -10,7 +10,7 @@ function App() {
     // <BrowserRouter>
     <Routes>
         <Route path="/" element={<CampaignList />} />
-        <Route path="/fund" element={<FundCampaign />} />
+        <Route path="/fund/:id" element={<FundCampaign />} />
         <Route path="/success" element={<SuccessPage />} />
     </Routes>
 // </BrowserRouter>
